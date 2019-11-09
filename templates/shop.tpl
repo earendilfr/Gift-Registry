@@ -20,8 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<title>Gift Registry - Shopping List for {$ufullname}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="js/jquery.js"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<link href="lightbox/css/jquery.lightbox-0.5.css" rel="stylesheet">
 	<script src="lightbox/js/jquery.lightbox-0.5.min.js"></script>
@@ -102,14 +101,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 					<td>
 						{$row.description|escape:'htmlall'}
 						{if $row.comment != ''}
-							<a class="btn btn-small" rel="popover" href="#" data-placement="right" data-original-title="Comment" data-content="{$row.comment|escape:'htmlall'}">...</a>
+							<a class="glyphicon glyphicon-comment no-color" rel="popover" href="#" data-placement="right" data-trigger="hover" data-original-title="Comment" data-content="{$row.comment|escape:'htmlall'}">...</a>
 						{/if}
 						{if $row.url != ''}
-							<a href="{$row.url}" target="_blank"><img src="images/link.png" border="0" alt="URL" title="URL"></a>
+                            <a class="glyphicon glyphicon-link no-color" href="{$row.url|escape:'htmlall'}" target="_blank"></a>
 						{/if}
 						{if $row.image_filename != '' && $opt.allow_images}
-							<a rel="lightbox" href="{$opt.image_subdir}/{$row.image_filename}" title="{$row.description|escape:'htmlall'}"><img src="images/image.png" border="0" alt="Image" /></a>
+							<a class="glyphicon glyphicon-picture no-color" rel="lightbox" href="{$opt.image_subdir}/{$row.image_filename}" title="{$row.description|escape:'htmlall'}"></a>
 						{/if}
+                        {if $row.create_userid != $shopfor}
+                            <br/>
+                            <span style="font-style: italic;">Proposed by {$row.pfullname}</span>
+                        {/if}
 					</td>
 					<td>{$row.category|default:"&nbsp;"}</td>
 					<td align="right">{$row.price}</td>
@@ -140,6 +143,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 								{/if}
 								{if $row.avail > 0 || $row.ireserved > 0}
 									<a href="shop.php?action=purchase&itemid={$row.itemid}&shopfor={$shopfor}"><img alt="{$purchasetext|escape:'htmlall'}" title="{$purchasetext|escape:'htmlall'}" src="images/credit-card-3.png" border="0" /></a>
+								{/if}
+								{if $row.create_userid == $userid}
+									<a href="item.php?zone=shop&action=edit&itemid={$row.itemid}&for={$shopfor}"><img alt="Edit Item" src="images/pencil.png" border="0" title="Edit Item" /></a>&nbsp;
+									<a rel="confirmitemdelete" data-content="{$row.description|escape:'htmlall'}" href="item.php?zone=shop&action=delete&itemid={$row.itemid}&for={$shopfor}"><img alt="Delete Item" src="images/bin.png" border="0" alt="Delete" title="Delete Item" /></a>
 								{/if}
 							{/if}
 							{if $row.ireserved > 0}
@@ -200,6 +207,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 								{/if}
 							{/if}
 						{/if}
+						{if $row.create_userid == $userid}
+							<a href="item.php?zone=shop&action=edit&itemid={$row.itemid}&for={$shopfor}"><img alt="Edit Item" src="images/pencil.png" border="0" title="Edit Item" /></a>&nbsp;
+							<a rel="confirmitemdelete" data-content="{$row.description|escape:'htmlall'}" href="item.php?zone=shop&action=delete&itemid={$row.itemid}&for={$shopfor}"><img alt="Delete Item" src="images/bin.png" border="0" alt="Delete" title="Delete Item" /></a>
+						{/if}
 					{/if}
 					{* <td> *}
 						<a href="shop.php?action=copy&itemid={$row.itemid}&shopfor={$shopfor}"><img alt="I Want This Too" title="I Want This Too" src="images/split-2.png" border="0" /></a>
@@ -208,6 +219,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			{/foreach}
 			</tbody>
 		</table>
+		<h5><a href="item.php?zone=shop&action=add&for={$shopfor}">Add a new item</a></h5>
 	</div>
 	</div>
 	</div>

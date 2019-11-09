@@ -25,10 +25,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			    <a class="navbar-brand brand" href="index.php">Gifts</a>
 			</div>
 			<div id="main-menu" class="navbar-collapse collapse navbar-responsive-collapse">
-				<ul id="main-menu-shortcuts" class="nav navbar-nav">		
+<!--				<ul id="main-menu-shortcuts" class="nav navbar-nav">		
 					<li><a href="shop.php?shopfor=2">Ryan's List</a></li>
 					<li><a href="shop.php?shopfor=3">Cousett's List</a></li>
-				</ul>
+				</ul>-->
     			<ul id="main-menu-left" class="nav navbar-nav">		
 					<li><a href="shoplist.php">My Shopping List</a></li>
 					<li><a href="mylist.php">My Items (printable)</a></li>

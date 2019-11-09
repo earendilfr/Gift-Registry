@@ -100,7 +100,8 @@ This creates a user called `username' that can connect from `host'.
 
 5. Configure includes/config.php
 
-You MUST edit includes/config.php to define your database connection.
+You MUST copy and edit includes/config.php.dist to includes/config.php to 
+define your database connection.
 It is required to set the `pdo_connection_string', `pdo_username'
 and `pdo_password' settings.  See 
 http://www.php.net/manual/en/pdo.construct.php for more information, 

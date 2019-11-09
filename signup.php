@@ -14,6 +14,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require_once(dirname(__FILE__) . "/includes/funcLib.php");
+require_once(dirname(__FILE__) . "/includes/funcMail.php");
 require_once(dirname(__FILE__) . "/includes/MySmarty.class.php");
 $smarty = new MySmarty();
 $opt = $smarty->opt();
@@ -50,13 +51,8 @@ if (isset($_POST["action"]) && $_POST["action"] == "signup") {
 			// send the e-mails to the administrators.
 			$stmt = $smarty->dbh()->prepare("SELECT fullname, email FROM {$opt["table_prefix"]}users WHERE admin = 1 AND email IS NOT NULL");
 			$stmt->execute();
-			while ($row = $stmt->fetch()) {
-				mail(
-					$row["email"],
-					"Gift Registry approval request for " . $fullname,
-					$fullname . " <" . $email . "> would like you to approve him/her for access to the Gift Registry.",
-					"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
-				) or die("Mail not accepted for " . $row["email"]);
+            while ($row = $stmt->fetch()) {
+                sendMail($opt["email_reply_to"],$row["email"],"Gift Registry approval request for " . $fullname,$fullname . " <" . $email . "> would like you to approve him/her for access to the Gift Registry.",$opt);
 			}
 		}
 		else {
@@ -75,14 +71,8 @@ if (isset($_POST["action"]) && $_POST["action"] == "signup") {
 					$stmt->bindParam(2, $familyid, PDO::PARAM_INT);
 					$stmt->execute();
 				}
-
-				mail(
-					$email,
-					"Gift Registry account created",
-					"Your Gift Registry account was created.\r\n" . 
-						"Your username is $username and your password is $pwd.",
-					"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
-				) or die("Mail not accepted for $email");	
+                
+                sendMail($opt["email_reply_to"],$email,"Gift Registry account created","Your Gift Registry account was created.\r\nYour username is $username and your password is $pwd.",$opt);
 			}
 		}
 	}

@@ -1,34 +1,20 @@
--- MySQL dump 9.11
---
--- Host: localhost    Database: conversion
--- ------------------------------------------------------
--- Server version	4.0.22-log
 
---
--- Table structure for table `allocs`
---
 
 CREATE TABLE `allocs` (
-  `itemid` int(11) NOT NULL default '0',
-  `userid` int(11) NOT NULL default '0',
-  `bought` tinyint(1) NOT NULL default '0',
-  `quantity` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`itemid`,`userid`,`bought`)
-) ENGINE=MyISAM;
+  `itemid` int(11) NOT NULL DEFAULT 0,
+  `userid` int(11) NOT NULL DEFAULT 0,
+  `bought` tinyint(1) NOT NULL DEFAULT 0,
+  `quantity` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`itemid`,`userid`,`bought`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `categories`
---
+
 
 CREATE TABLE `categories` (
-  `categoryid` int(11) NOT NULL auto_increment,
-  `category` varchar(50) default NULL,
-  PRIMARY KEY  (`categoryid`)
-) ENGINE=MyISAM;
-
---
--- Dumping data for table `categories`
---
+  `categoryid` int(11) NOT NULL AUTO_INCREMENT,
+  `category` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`categoryid`)
+) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 
 INSERT INTO `categories` VALUES (1,'Books');
 INSERT INTO `categories` VALUES (2,'Music');
@@ -47,73 +33,57 @@ INSERT INTO `categories` VALUES (14,'Computer');
 INSERT INTO `categories` VALUES (15,'Games');
 INSERT INTO `categories` VALUES (16,'Tools');
 
---
--- Table structure for table `events`
---
 
 CREATE TABLE `events` (
-  `eventid` int(11) NOT NULL auto_increment,
-  `userid` int(11) default NULL,
-  `description` varchar(100) NOT NULL default '',
-  `eventdate` date NOT NULL default '0000-00-00',
-  `recurring` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`eventid`)
-) ENGINE=MyISAM;
-
---
--- Dumping data for table `events`
---
+  `eventid` int(11) NOT NULL AUTO_INCREMENT,
+  `userid` int(11) DEFAULT NULL,
+  `description` varchar(100) NOT NULL DEFAULT '',
+  `eventdate` date NOT NULL DEFAULT '0000-00-00',
+  `recurring` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`eventid`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 INSERT INTO `events` VALUES (1,NULL,'Christmas','2000-12-25',1);
 
---
--- Table structure for table `items`
---
 
 CREATE TABLE `items` (
-  `itemid` int(11) NOT NULL auto_increment,
-  `userid` int(11) NOT NULL default '0',
-  `description` varchar(255) NOT NULL default '',
-  `price` decimal(7,2) default NULL,
-  `source` varchar(255) NOT NULL default '',
-  `ranking` int(11) NOT NULL default '0',
-  `url` varchar(255) default NULL,
-  `category` int(11) default NULL,
-  `comment` text,
-  `quantity` int(11) NOT NULL default '0',
-  `image_filename` varchar(255) default NULL,
-  PRIMARY KEY  (`itemid`)
-) ENGINE=MyISAM;
+  `itemid` int(11) NOT NULL AUTO_INCREMENT,
+  `userid` int(11) NOT NULL DEFAULT 0,
+  `create_userid` int(11) NOT NULL DEFAULT 0,
+  `description` varchar(255) NOT NULL DEFAULT '',
+  `visible_owner` tinyint(1) DEFAULT 0,
+  `price` decimal(7,2) DEFAULT NULL,
+  `source` varchar(255) NOT NULL DEFAULT '',
+  `ranking` int(11) NOT NULL DEFAULT 0,
+  `url` varchar(255) DEFAULT NULL,
+  `category` int(11) DEFAULT NULL,
+  `comment` text DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 0,
+  `image_filename` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`itemid`)
+) ENGINE=MyISAM AUTO_INCREMENT=49 DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `messages`
---
+
 
 CREATE TABLE `messages` (
-  `messageid` int(11) NOT NULL auto_increment,
-  `sender` int(11) NOT NULL default '0',
-  `recipient` int(11) NOT NULL default '0',
-  `message` varchar(255) NOT NULL default '',
-  `isread` tinyint(1) NOT NULL default '0',
-  `created` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`messageid`)
-) ENGINE=MyISAM;
+  `messageid` int(11) NOT NULL AUTO_INCREMENT,
+  `sender` int(11) NOT NULL DEFAULT 0,
+  `recipient` int(11) NOT NULL DEFAULT 0,
+  `message` varchar(255) NOT NULL DEFAULT '',
+  `isread` tinyint(1) NOT NULL DEFAULT 0,
+  `created` date NOT NULL DEFAULT '0000-00-00',
+  PRIMARY KEY (`messageid`)
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `ranks`
---
+
 
 CREATE TABLE `ranks` (
-  `ranking` int(11) NOT NULL auto_increment,
-  `title` varchar(50) NOT NULL default '',
-  `rendered` varchar(255) NOT NULL default '',
-  `rankorder` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`ranking`)
-) ENGINE=MyISAM;
-
---
--- Dumping data for table `ranks`
---
+  `ranking` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(50) NOT NULL DEFAULT '',
+  `rendered` varchar(255) NOT NULL DEFAULT '',
+  `rankorder` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ranking`)
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 INSERT INTO `ranks` VALUES (1,'1 - Wouldn\'t mind it','<img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_off.gif\" alt=\"\"><img src=\"images/star_off.gif\" alt=\"\"><img src=\"images/star_off.gif\" alt=\"\"><img src=\"images/star_off.gif\" alt=\"\">',1);
 INSERT INTO `ranks` VALUES (2,'2 - Would be nice to have','<img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_off.gif\" alt=\"\"><img src=\"images/star_off.gif\" alt=\"\"><img src=\"images/star_off.gif\" alt=\"\">',2);
@@ -121,59 +91,53 @@ INSERT INTO `ranks` VALUES (3,'3 - Would make me happy','<img src=\"images/star_
 INSERT INTO `ranks` VALUES (4,'4 - I would really, really like this','<img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_off.gif\" alt=\"\">',4);
 INSERT INTO `ranks` VALUES (5,'5 - I\'d love to get this','<img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_on.gif\" alt=\"*\"><img src=\"images/star_on.gif\" alt=\"*\">',5);
 
---
--- Table structure for table `shoppers`
---
 
 CREATE TABLE `shoppers` (
-  `shopper` int(11) NOT NULL default '0',
-  `mayshopfor` int(11) NOT NULL default '0',
-  `pending` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`shopper`,`mayshopfor`)
-) ENGINE=MyISAM;
+  `shopper` int(11) NOT NULL DEFAULT 0,
+  `mayshopfor` int(11) NOT NULL DEFAULT 0,
+  `pending` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`shopper`,`mayshopfor`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `families`
---
 
-CREATE TABLE families (
-  familyid int(11) NOT NULL auto_increment,
-  familyname varchar(255) NOT NULL default '',
-  PRIMARY KEY  (familyid)
-) ENGINE=MyISAM;
 
---
--- Table structure for table `users`
---
+CREATE TABLE `families` (
+  `familyid` int(11) NOT NULL AUTO_INCREMENT,
+  `familyname` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`familyid`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+
 
 CREATE TABLE `users` (
-  `userid` int(11) NOT NULL auto_increment,
-  `username` varchar(20) NOT NULL default '',
-  `password` varchar(50) NOT NULL default '',
-  `fullname` varchar(50) NOT NULL default '',
-  `email` varchar(255) default NULL,
-  `approved` tinyint(1) NOT NULL default '0',
-  `admin` tinyint(1) NOT NULL default '0',
-  `comment` text,
-  `email_msgs` tinyint(1) NOT NULL default '0',
-  `list_stamp` datetime default NULL,
-  `initialfamilyid` int NULL,
-  PRIMARY KEY  (`userid`)
-) ENGINE=MyISAM;
+  `userid` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(20) NOT NULL DEFAULT '',
+  `password` varchar(50) NOT NULL DEFAULT '',
+  `fullname` varchar(50) NOT NULL DEFAULT '',
+  `email` varchar(255) DEFAULT NULL,
+  `approved` tinyint(1) NOT NULL DEFAULT 0,
+  `admin` tinyint(1) NOT NULL DEFAULT 0,
+  `comment` text DEFAULT NULL,
+  `email_msgs` tinyint(1) NOT NULL DEFAULT 0,
+  `list_stamp` datetime DEFAULT NULL,
+  `initialfamilyid` int(11) DEFAULT NULL,
+  PRIMARY KEY (`userid`)
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `memberships`
---
 
-CREATE TABLE memberships (
-  userid int(11) NOT NULL default '0',
-  familyid int(11) NOT NULL default '0',
-  PRIMARY KEY  (userid,familyid)
-) ENGINE=MyISAM;
+
+CREATE TABLE `memberships` (
+  `userid` int(11) NOT NULL DEFAULT 0,
+  `familyid` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`userid`,`familyid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
 
 CREATE TABLE `subscriptions` (
-	`publisher` int(11) NOT NULL,
-	`subscriber` int(11) NOT NULL,
-	`last_notified` datetime DEFAULT NULL,
-	PRIMARY KEY (`publisher`,`subscriber`)
-) ENGINE=MyISAM;
+  `publisher` int(11) NOT NULL,
+  `subscriber` int(11) NOT NULL,
+  `last_notified` datetime DEFAULT NULL,
+  PRIMARY KEY (`publisher`,`subscriber`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+

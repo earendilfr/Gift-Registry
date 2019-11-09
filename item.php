@@ -23,8 +23,20 @@ if (!isset($_SESSION["userid"])) {
 	header("Location: " . getFullPath("login.php"));
 	exit;
 }
+elseif (!empty($_REQUEST["for"]) && $_REQUEST["for"] != $_SESSION["userid"]) {
+	$userid = $_REQUEST["for"];
+	$visible = 0;
+}
 else {
 	$userid = $_SESSION["userid"];
+	$visible = 1;
+}
+
+if (isset($_REQUEST["zone"]) && file_exists($_REQUEST["zone"].".php")) {
+	$next_page = $_REQUEST["zone"];
+}
+else {
+	$next_page = "index";
 }
 
 // for security, let's make sure that if an itemid was passed in, it belongs
@@ -32,9 +44,12 @@ else {
 // the item's owner.
 if (isset($_REQUEST["itemid"]) && $_REQUEST["itemid"] != "") {
 	try {
-		$stmt = $smarty->dbh()->prepare("SELECT * FROM {$opt["table_prefix"]}items WHERE userid = ? AND itemid = ?");
+		error_log("$userid | ".$_SESSION["userid"]." | SELECT * FROM {$opt["table_prefix"]}items WHERE userid = ? AND itemid = ? AND visible_owner IS ".($userid != $_SESSION["userid"])?"FALSE":"TRUE");
+		$stmt = $smarty->dbh()->prepare("SELECT * FROM {$opt["table_prefix"]}items WHERE (userid = ? OR create_userid = ?) AND itemid = ? AND visible_owner = ?");
 		$stmt->bindParam(1, $userid, PDO::PARAM_INT);
-		$stmt->bindValue(2, (int) $_REQUEST["itemid"], PDO::PARAM_INT);
+		$stmt->bindValue(2, $userid, PDO::PARAM_INT);
+		$stmt->bindValue(3, (int) $_REQUEST["itemid"], PDO::PARAM_INT);
+		$stmt->bindValue(4, ($userid != $_SESSION["userid"])?0:1, PDO::PARAM_BOOL);
 		$stmt->execute();
 		if (!$stmt->fetch()) {
 			die("Nice try! (That's not your item.)");
@@ -46,8 +61,11 @@ if (isset($_REQUEST["itemid"]) && $_REQUEST["itemid"] != "") {
 }
 
 $action = "";
+
 if (!empty($_REQUEST["action"])) {
-	$action = $_REQUEST["action"];
+    $action = $_REQUEST["action"];
+    $haserror = false;
+
 	
 	if ($action == "insert" || $action == "update") {
 		/* validate the data. */
@@ -58,9 +76,9 @@ if (!empty($_REQUEST["action"])) {
 		$category = trim($_REQUEST["category"]);
 		$ranking = $_REQUEST["ranking"];
 		$comment = $_REQUEST["comment"];
-		$quantity = (int) $_REQUEST["quantity"];
+        $quantity = (int) $_REQUEST["quantity"];
+        $image = $_REQUEST["image"];
 
-		$haserror = false;
 		if ($description == "") {
 			$haserror = true;
 			$description_error = "A description is required.";
@@ -87,28 +105,45 @@ if (!empty($_REQUEST["action"])) {
 		}
 	}
 
-	if (!$haserror) {
-		if ($_REQUEST["image"] == "remove" || $_REQUEST["image"] == "replace") {
+	if (!$haserror && isset($image)) {
+		if ($image == "remove" || $image == "replace") {
 			deleteImageForItem((int) $_REQUEST["itemid"], $smarty->dbh(), $smarty->opt());
 		}
-		if ($_REQUEST["image"] == "upload" || $_REQUEST["image"] == "replace") {
+        if ($image == "upload" || $image == "replace") {
 			/* TODO: verify that it's an image using $_FILES["imagefile"]["type"] */
-			// what's the extension?
-			$parts = pathinfo($_FILES["imagefile"]["name"]);
-			$uploaded_file_ext = $parts['extension'];
-			// what is full path to store images?  get it from the currently executing script.
-			$parts = pathinfo($_SERVER["SCRIPT_FILENAME"]);
-			$upload_dir = $parts['dirname'];
-			// generate a temporary file in the configured directory.
-			$temp_name = tempnam($upload_dir . "/" . $opt["image_subdir"],"");
-			// unlink it, we really want an extension on that.
-			unlink($temp_name);
-			// here's the name we really want to use.  full path is included.
-			$image_filename = $temp_name . "." . $uploaded_file_ext;
-			// move the PHP temporary file to that filename.
-			move_uploaded_file($_FILES["imagefile"]["tmp_name"],$image_filename);
-			// the name we're going to record in the DB is the filename without the path.
-			$image_base_filename = basename($image_filename);
+            $parts = pathinfo($_FILES["imagefile"]["name"]);
+
+            // We don't take in count file zith no ASCII charactere
+            $image_infos = getimagesize($_FILES["imagefile"]["tmp_name"]);
+            if (!$image_infos) {
+                error_log("Unable to move the POST file: it's not an image\n");
+            // Only allow valid extension
+            } elseif (!preg_match('/^\.(jpe?g|png|gif)$/i',image_type_to_extension($image_infos[2]))) {
+                error_log("Unable to move the POST file: the file extension is not valid");
+            // Not allow empty files
+            } elseif ($_FILES['imagefile']['size'] <=0) {
+                error_log("Unable to move the POST file: the file is empty");
+            } else {
+                // what's the extension?
+                $uploaded_file_ext = image_type_to_extension($image_infos[2]);
+			    // what is full path to store images?  get it from the currently executing script.
+			    $parts = pathinfo($_SERVER["SCRIPT_FILENAME"]);
+			    $upload_dir = $parts['dirname'];
+			    // generate a temporary file in the configured directory.
+			    $temp_name = tempnam($upload_dir . "/" . $opt["image_subdir"],"");
+			    // unlink it, we really want an extension on that.
+			    unlink($temp_name);
+			    // here's the name we really want to use.  full path is included.
+			    $image_filename = $temp_name . $uploaded_file_ext;
+			    // move the PHP temporary file to that filename.
+			    error_log("file: $image_filename | $temp_name | $upload_dir\n");
+			    if (move_uploaded_file($_FILES["imagefile"]["tmp_name"],$image_filename)) {
+			        // the name we're going to record in the DB is the filename without the path.
+                    $image_base_filename = basename($image_filename);
+                } else {
+                    error_log("Unable to move the POST file\n");
+                }
+            }
 		}
 	}
 	
@@ -143,7 +178,7 @@ if (!empty($_REQUEST["action"])) {
 			stampUser($userid, $smarty->dbh(), $smarty->opt());
 			processSubscriptions($userid, $action, $description, $smarty->dbh(), $smarty->opt());
 
-			header("Location: " . getFullPath("index.php?message=Item+deleted."));
+			header("Location: " . getFullPath("$next_page.php?message=Item+deleted."));
 			exit;
 		}
 		catch (PDOException $e) {
@@ -180,26 +215,28 @@ if (!empty($_REQUEST["action"])) {
 	}
 	else if ($action == "insert") {
 		if (!$haserror) {
-			$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}items(userid,description,price,source,category,url,ranking,comment,quantity" . ($image_base_filename != "" ? ",image_filename" : "") . ") " .
-				"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?" . ($image_base_filename != "" ? ", ?)" : ")"));
+			$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}items(userid,create_userid,description,visible_owner,price,source,category,url,ranking,comment,quantity" . ($image_base_filename != "" ? ",image_filename" : "") . ") " .
+				"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?" . ($image_base_filename != "" ? ", ?)" : ")"));
 			$stmt->bindParam(1, $userid, PDO::PARAM_INT);
-			$stmt->bindParam(2, $description, PDO::PARAM_STR);
-			$stmt->bindParam(3, $price);
-			$stmt->bindParam(4, $source, PDO::PARAM_STR);
-			$stmt->bindParam(5, $category, PDO::PARAM_INT);
-			$stmt->bindParam(6, $url, PDO::PARAM_STR);
-			$stmt->bindParam(7, $ranking, PDO::PARAM_INT);
-			$stmt->bindParam(8, $comment, PDO::PARAM_STR);
-			$stmt->bindParam(9, $quantity, PDO::PARAM_INT);
+			$stmt->bindParam(2, $_SESSION["userid"], PDO::PARAM_INT);
+			$stmt->bindParam(3, $description, PDO::PARAM_STR);
+			$stmt->bindParam(4, $visible, PDO::PARAM_BOOL);
+			$stmt->bindParam(5, $price);
+			$stmt->bindParam(6, $source, PDO::PARAM_STR);
+			$stmt->bindParam(7, $category, PDO::PARAM_INT);
+			$stmt->bindParam(8, $url, PDO::PARAM_STR);
+			$stmt->bindParam(9, $ranking, PDO::PARAM_INT);
+			$stmt->bindParam(10, $comment, PDO::PARAM_STR);
+			$stmt->bindParam(11, $quantity, PDO::PARAM_INT);
 			if ($image_base_filename != "") {
-				$stmt->bindParam(10, $image_base_filename, PDO::PARAM_STR);
+				$stmt->bindParam(12, $image_base_filename, PDO::PARAM_STR);
 			}
 			$stmt->execute();
 			
 			stampUser($userid, $smarty->dbh(), $smarty->opt());
 			processSubscriptions($userid, $action, $description, $smarty->dbh(), $smarty->opt());
 
-			header("Location: " . getFullPath("index.php"));
+			header("Location: " . getFullPath("$next_page.php"));
 			exit;
 		}
 	}
@@ -237,7 +274,7 @@ if (!empty($_REQUEST["action"])) {
 			stampUser($userid, $smarty->dbh(), $smarty->opt());
 			processSubscriptions($userid, $action, $description, $smarty->dbh(), $smarty->opt());
 
-			header("Location: " . getFullPath("index.php"));
+			header("Location: " . getFullPath("$next_page.php"));
 			exit;		
 		}
 	}

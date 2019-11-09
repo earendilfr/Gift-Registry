@@ -20,8 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<title>Gift Registry - Edit Item</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="js/jquery.js"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="js/jquery.validate.min.js"></script>
 	<script src="js/giftreg.js"></script>
@@ -124,11 +123,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			<form name="itemform" id="itemform" method="POST" action="item.php" enctype="multipart/form-data" class="well form-horizontal">
 				<fieldset>
 					<legend>{if $action == 'edit' || (isset($haserror) && $action == 'update')}Edit Item{else}Add Item{/if}</legend>
+					{if isset($next_page)}
+						<input type="hidden" name="zone" value="{$next_page}">
+					{/if}
 					{if $action == 'edit' || (isset($haserror) && $action == 'update')}
 						<input type="hidden" name="itemid" value="{$itemid}">
 						<input type="hidden" name="action" value="update">
 					{elseif $action == "add" || (isset($haserror) && $action == 'insert')}
 						<input type="hidden" name="action" value="insert">
+					{/if}
+					{if isset($userid) }
+						<input type="hidden" name="for" value="{$userid}">
 					{/if}
 					<div class="control-group {if isset($description_error)}warning{/if}">
 						<label class="control-label" for="description">Description</label>
@@ -208,7 +213,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 					</div>
 					{if $opt.allow_images}
 						<div class="control-group">
-							<label class="control-label" for="image">Image (optional)</label>
+							<label class="control-label" for="image">Image (optional - only PNG, GIF or JPEG)</label>
 							<div class="controls">
 								{if $image_filename == ''}
 									<input type="radio" name="image" value="none" CHECKED>

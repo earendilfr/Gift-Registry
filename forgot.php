@@ -14,6 +14,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require_once(dirname(__FILE__) . "/includes/funcLib.php");
+require_once(dirname(__FILE__) . "/includes/funcMail.php");
 require_once(dirname(__FILE__) . "/includes/MySmarty.class.php");
 $smarty = new MySmarty();
 $opt = $smarty->opt();
@@ -38,14 +39,8 @@ if (isset($_POST["action"]) && $_POST["action"] == "forgot") {
 				$stmt->bindParam(1, $pwd, PDO::PARAM_STR);
 				$stmt->bindParam(2, $username, PDO::PARAM_STR);
 
-				$stmt->execute();
-				mail(
-					$email,
-					"Gift Registry password reset",
-					"Your Gift Registry account information:\r\n" . 
-						"Your username is '" . $username . "' and your new password is '$pwd'.",
-					"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
-				) or die("Mail not accepted for $email");
+                $stmt->execute();
+                sendMail($opt["email_reply_to"],$email,"Gift Registry password reset",sprintf("Your Gift Registry account information:\r\nYour username is '%s' and your new password is '%s'",$username,$pwd),$opt);
 			}
 		}
 		else {

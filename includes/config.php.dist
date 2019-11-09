@@ -18,11 +18,11 @@ function getGlobalOptions() {
 		/* The PDO connection string.
 			http://www.php.net/manual/en/pdo.connections.php
 		*/
-		"pdo_connection_string" => "mysql:host=localhost;dbname=giftdb",
+		"pdo_connection_string" => "mysql:host=localhost;dbname=gift",
 
 		/* The database username and password. */
 		"pdo_username" => "gift",
-		"pdo_password" => "Q8oOB7kZtVPCVVfu8YhramXyUHBjlO1S",
+		"pdo_password" => "password_to_change",
 
 		/* The maximum number of days before an event which produces a notification. */
 		"event_threshold" => "60",
@@ -47,7 +47,7 @@ function getGlobalOptions() {
 
 		/* The e-mail type. Choose between SMTP or Mail. By default, Mail */
 		"email_type" => "smtp",
-
+		
 		/* Parameters for SMTP e-mailling function */
 		"email_smtp_auth" => false, // default: false
 		"email_smtp_host" => "localhost", // default: localhost

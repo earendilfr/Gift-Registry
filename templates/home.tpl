@@ -20,8 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<title>Gift Registry - Home Page for {$fullname|escape:'htmlall'}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="js/jquery.js"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<link href="lightbox/css/jquery.lightbox-0.5.css" rel="stylesheet">
 	<script src="lightbox/js/jquery.lightbox-0.5.min.js"></script>
@@ -103,8 +102,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 					<tr valign="top">
 						<td>
 							{$row.description|escape:'htmlall'}
-							 {if $row.comment != ''}
-								<a class="glyphicon glyphicon-comment no-color" rel="popover" href="#" data-placement="right" data-original-title="Comment" data-content="{$row.comment|escape:'htmlall'}"></a>
+							{if $row.comment != ''}
+								<a class="glyphicon glyphicon-comment no-color" rel="popover" href="#" data-placement="right" data-trigger="hover" data-original-title="Comment" data-content="{$row.comment|escape:'htmlall'}"></a>
 							{/if}
 							{if $row.url != ''}
 								<a class="glyphicon glyphicon-link no-color" href="{$row.url|escape:'htmlall'}" target="_blank"></a>

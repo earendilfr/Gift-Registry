@@ -14,6 +14,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require_once(dirname(__FILE__) . "/includes/funcLib.php");
+require_once(dirname(__FILE__) . "/includes/funcMail.php");
 require_once(dirname(__FILE__) . "/includes/MySmarty.class.php");
 $smarty = new MySmarty();
 $opt = $smarty->opt();
@@ -49,14 +50,8 @@ if ($action == "approve") {
 	$stmt = $smarty->dbh()->prepare("SELECT username, email FROM {$opt["table_prefix"]}users WHERE userid = ?");
 	$stmt->bindValue(1, (int) $_GET["userid"], PDO::PARAM_INT);
 	$stmt->execute();
-	if ($row = $stmt->fetch()) {
-		mail(
-			$row["email"],
-			"Gift Registry application approved",
-			"Your Gift Registry application was approved by " . $_SESSION["fullname"] . ".\r\n" . 
-				"Your username is " . $row["username"] . " and your password is $pwd.",
-			"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
-		) or die("Mail not accepted for " . $row["email"]);	
+    if ($row = $stmt->fetch()) {
+        mailSend($opt["email_reply_to"],$row["email"],"Gift Registry application approved","Your Gift Registry application was approved by " . $_SESSION["fullname"] . ".\r\nYour username is " . $row["username"] . " and your password is $pwd.",$opt);
 	}
 	header("Location: " . getFullPath("index.php"));
 	exit;
@@ -66,13 +61,8 @@ else if ($action == "reject") {
 	$stmt = $smarty->dbh()->prepare("SELECT email FROM {$opt["table_prefix"]}users WHERE userid = ?");
 	$stmt->bindValue(1, (int) $_GET["userid"], PDO::PARAM_INT);
 	$stmt->execute();
-	if ($row = $stmt->fetch()) {
-		mail(
-			$row["email"],
-			"Gift Registry application denied",
-			"Your Gift Registry application was denied by " . $_SESSION["fullname"] . ".",
-			"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
-		) or die("Mail not accepted for " . $row["email"]);	
+    if ($row = $stmt->fetch()) {
+        mailSend($opt["email_reply_to"],$row["email"],"Gift Registry application denied","Your Gift Registry application was denied by " . $_SESSION["fullname"] . ".",$opt);
 	}
 
 	$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}users WHERE userid = ?");

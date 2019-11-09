@@ -14,6 +14,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require_once(dirname(__FILE__) . "/includes/funcLib.php");
+require_once(dirname(__FILE__) . "/includes/funcMail.php");
 require_once(dirname(__FILE__) . "/includes/MySmarty.class.php");
 $smarty = new MySmarty();
 $opt = $smarty->opt();
@@ -132,13 +133,7 @@ else if ($action == "insert") {
 		$stmt->bindParam(7, $userisadmin, PDO::PARAM_BOOL);
 		$stmt->execute();
 
-		mail(
-			$email,
-			"Gift Registry account created",
-			"Your Gift Registry account was created.\r\n" . 
-				"Your username is $username and your password is $pwd.",
-			"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
-		) or die("Mail not accepted for $email");	
+        sendMail($opt["email_reply_to"],$email,"Gift Registry account created","Your Gift Registry account was created.\r\nYour username is $username and your password is $pwd.",$opt);
 		header("Location: " . getFullPath("users.php?message=User+added+and+e-mail+sent."));
 		exit;
 	}
@@ -174,13 +169,8 @@ else if ($action == "reset") {
 	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}users SET password = {$opt["password_hasher"]}(?) WHERE userid = ?");
 	$stmt->bindParam(1, $pwd, PDO::PARAM_STR);
 	$stmt->bindParam(2, $resetuserid, PDO::PARAM_INT);
-	$stmt->execute();
-	mail(
-		$resetemail,
-		"Gift Registry password reset",
-		"Your Gift Registry password was reset to $pwd.",
-		"From: {$opt["email_from"]}\r\nReply-To: {$opt["email_reply_to"]}\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
-	) or die("Mail not accepted for $email");
+    $stmt->execute();
+    sendMail($opt["email_reply_to"],$resetemail,"Gift Registry password reset","Your Gift Registry password was reset to $pwd.",$opt);
 	header("Location: " . getFullPath("users.php?message=Password+reset."));
 	exit;
 }

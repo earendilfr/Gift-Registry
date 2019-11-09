@@ -13,6 +13,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+
 function getFullPath($url) {
 	$fp = $_SERVER["SERVER_PORT"] == "443" ? "https://" : "http://";
 	$fp .= $_SERVER["HTTP_HOST"];
@@ -139,13 +140,9 @@ function sendMessage($sender, $recipient, $message, $dbh, $opt) {
 	$stmt->bindParam(2, $recipient, PDO::PARAM_INT);
 	$stmt->execute();
 	if ($row = $stmt->fetch()) {
-		if ($row["email_msgs"] == 1) {
-			mail(
-				$row["remail"],
-				"Gift Registry message from " . $row["fullname"],
-				$row["fullname"] . " <" . $row["semail"] . "> sends:\r\n" . $message,
-				"From: {$opt["email_from"]}\r\nReply-To: " . $row["semail"] . "\r\nX-Mailer: {$opt["email_xmailer"]}\r\n"
-			) or die("Mail not accepted for " . $row["remail"]);
+        if ($row["email_msgs"] == 1) {
+			require_once(dirname(__FILE__) . "/funcMail.php");
+            sendMail($row["semail"],$row["remail"],"Gift Registry message from " . $row["fullname"],$row["fullname"] . " <" . $row["semail"] . "> sends:\r\n" . $message,$opt);
 		}
 	}
 	else {

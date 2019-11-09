@@ -133,7 +133,8 @@ else {
 	for those items with a quantity of 1.  if the item's quantity > 1 we'll query alloc when we
 	get to that record.  the theory is that most items will have quantity = 1 so we'll make the least
 	number of trips. */
-$stmt = $smarty->dbh()->prepare("SELECT i.itemid, description, price, source, c.category, url, image_filename, " .
+$stmt = $smarty->dbh()->prepare("SELECT i.itemid, i.userid, create_userid, description, price, source, c.category, url, image_filename, " .
+        "up.fullname AS pfullname, " .
 		"ub.fullname AS bfullname, ub.userid AS boughtid, " .
 		"ur.fullname AS rfullname, ur.userid AS reservedid, " .
 		"rendered, i.comment, i.quantity " .
@@ -142,8 +143,9 @@ $stmt = $smarty->dbh()->prepare("SELECT i.itemid, description, price, source, c.
 	"LEFT OUTER JOIN {$opt["table_prefix"]}ranks r ON r.ranking = i.ranking " .
 	"LEFT OUTER JOIN {$opt["table_prefix"]}allocs a ON a.itemid = i.itemid AND i.quantity = 1 " .	// only join allocs for single-quantity items.
 	"LEFT OUTER JOIN {$opt["table_prefix"]}users ub ON ub.userid = a.userid AND a.bought = 1 " .
-	"LEFT OUTER JOIN {$opt["table_prefix"]}users ur ON ur.userid = a.userid AND a.bought = 0 " .
-	"WHERE i.userid = $shopfor " .
+    "LEFT OUTER JOIN {$opt["table_prefix"]}users ur ON ur.userid = a.userid AND a.bought = 0 " .
+    "LEFT OUTER JOIN {$opt["table_prefix"]}users up ON up.userid = i.create_userid " .
+	"WHERE i.userid = ? " .
 	"ORDER BY " . $sortby);
 $stmt->bindParam(1, $shopfor, PDO::PARAM_INT);
 $stmt->execute();
