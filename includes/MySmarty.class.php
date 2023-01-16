@@ -1,6 +1,6 @@
 <?php
 
-define('SMARTY_DIR', dirname(__FILE__) . "/Smarty-3.1.12/libs/");
+define('SMARTY_DIR', dirname(__FILE__) . "/Smarty-4.3.0/libs/");
 require_once(SMARTY_DIR . "Smarty.class.php");
 require_once(dirname(__FILE__) . "/config.php");
 
@@ -27,10 +27,10 @@ class MySmarty extends Smarty {
 		return $opt;
 	}
 
-	public function display($t) {
+	public function display($template = null, $cache_id = null, $compile_id = null, $parent = null) {
 		parent::assign('isadmin', $_SESSION['admin']);
 		parent::assign('opt', $this->opt());
-		parent::display($t);
+		parent::display($template, $cache_id, $compile_id, $parent);
 	}
 }
 ?>

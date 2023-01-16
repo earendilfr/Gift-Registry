@@ -51,7 +51,7 @@ if ($action == "approve") {
 	$stmt->bindValue(1, (int) $_GET["userid"], PDO::PARAM_INT);
 	$stmt->execute();
     if ($row = $stmt->fetch()) {
-        mailSend($opt["email_reply_to"],$row["email"],"Gift Registry application approved","Your Gift Registry application was approved by " . $_SESSION["fullname"] . ".\r\nYour username is " . $row["username"] . " and your password is $pwd.",$opt);
+        sendMail($opt["email_reply_to"],$row["email"],"Gift Registry application approved","Your Gift Registry application was approved by " . $_SESSION["fullname"] . ".\r\nYour username is " . $row["username"] . " and your password is $pwd.",$opt);
 	}
 	header("Location: " . getFullPath("index.php"));
 	exit;
@@ -62,7 +62,7 @@ else if ($action == "reject") {
 	$stmt->bindValue(1, (int) $_GET["userid"], PDO::PARAM_INT);
 	$stmt->execute();
     if ($row = $stmt->fetch()) {
-        mailSend($opt["email_reply_to"],$row["email"],"Gift Registry application denied","Your Gift Registry application was denied by " . $_SESSION["fullname"] . ".",$opt);
+        sendMail($opt["email_reply_to"],$row["email"],"Gift Registry application denied","Your Gift Registry application was denied by " . $_SESSION["fullname"] . ".",$opt);
 	}
 
 	$stmt = $smarty->dbh()->prepare("DELETE FROM {$opt["table_prefix"]}users WHERE userid = ?");
