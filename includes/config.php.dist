@@ -45,20 +45,20 @@ function getGlobalOptions() {
 		/* The number of your items that show on each page. */
 		"items_per_page" => 10,
 
-		/* The e-mail type. Choose between SMTP or Mail. By default, Mail */
-		"email_type" => "smtp",
-		
-		/* Parameters for SMTP e-mailling function */
-		"email_smtp_auth" => false, // default: false
-		"email_smtp_host" => "localhost", // default: localhost
-		"email_smtp_username" => "", // default: empty
-		"email_smtp_password" => "", // default: empty
+        /* The e-mail type. Choose between SMTP or Mail. By default, Mail */
+        "email_type" => "smtp",
+
+        /* Parameters for SMTP e-mailling function */
+        "email_smtp_auth" => false, // default: false
+        "email_smtp_host" => "localhost", // default: localhost
+        "email_smtp_username" => "", // default: empty
+        "email_smtp_password" => "", // default: empty
 
 		/* The e-mail From: header. */
-		"email_from" => "nobody@toleressea.fr",
+		"email_from" => "nobody@example.com",
 
 		/* The e-mail Reply-To: header. */
-		"email_reply_to" => "admin@toleressea.fr",
+		"email_reply_to" => "admin@example.com",
 
 		/* The e-mail X-Mailer header. */
 		"email_xmailer" => "PHP/" . phpversion(),

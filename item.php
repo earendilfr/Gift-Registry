@@ -44,7 +44,6 @@ else {
 // the item's owner.
 if (isset($_REQUEST["itemid"]) && $_REQUEST["itemid"] != "") {
 	try {
-		error_log("$userid | ".$_SESSION["userid"]." | SELECT * FROM {$opt["table_prefix"]}items WHERE userid = ? AND itemid = ? AND visible_owner IS ".($userid != $_SESSION["userid"])?"FALSE":"TRUE");
 		$stmt = $smarty->dbh()->prepare("SELECT * FROM {$opt["table_prefix"]}items WHERE (userid = ? OR create_userid = ?) AND itemid = ? AND visible_owner = ?");
 		$stmt->bindParam(1, $userid, PDO::PARAM_INT);
 		$stmt->bindValue(2, $userid, PDO::PARAM_INT);
