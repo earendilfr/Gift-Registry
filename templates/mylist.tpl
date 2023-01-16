@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     <link href="lightbox/css/jquery.lightbox-0.5.css" rel="stylesheet">
     <script src="lightbox/js/jquery.lightbox-0.5.min.js"></script>
 
-    <script language="JavaScript" type="text/javascript">
+    <script language="JavaScript" type="text/javascript" nonce="gift-registry">
         function printPage() {
             window.print();
         }

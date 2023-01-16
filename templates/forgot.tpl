@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<script src="js/jquery.validate.min.js"></script>
 	<script src="js/giftreg.js"></script>
 
-	<script language="JavaScript" type="text/javascript">
+	<script language="JavaScript" type="text/javascript" nonce="gift-registry">
 		$(document).ready(function() {
 			$("#forgotform").validate({
 				highlight: validate_highlight,
