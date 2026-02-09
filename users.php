@@ -122,10 +122,11 @@ else if ($action == "") {
 else if ($action == "insert") {
 	if (!$haserror) {
 		// generate a password and insert the row.
-		$pwd = generatePassword($opt);
-		$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}users(username,password,fullname,email,email_msgs,approved,admin) VALUES(?, {$opt["password_hasher"]}(?), ?, ?, ?, ?, ?)");
+        $pwd = generateStrongPassword($opt["password_length"]);
+        $hashPwd = generateHashedPassword($pwd, $opt["password_hasher"]);
+		$stmt = $smarty->dbh()->prepare("INSERT INTO {$opt["table_prefix"]}users(username,password,fullname,email,email_msgs,approved,admin) VALUES(?, ?, ?, ?, ?, ?, ?)");
 		$stmt->bindParam(1, $username, PDO::PARAM_STR);
-		$stmt->bindParam(2, $pwd, PDO::PARAM_STR);
+		$stmt->bindParam(2, $hashPwd, PDO::PARAM_STR);
 		$stmt->bindParam(3, $fullname, PDO::PARAM_STR);
 		$stmt->bindParam(4, $email, PDO::PARAM_STR);
 		$stmt->bindParam(5, $email_msgs, PDO::PARAM_BOOL);
@@ -165,9 +166,10 @@ else if ($action == "reset") {
 	$resetemail = $_GET["email"];
 	
 	// generate a password and insert the row.
-	$pwd = generatePassword($opt);
-	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}users SET password = {$opt["password_hasher"]}(?) WHERE userid = ?");
-	$stmt->bindParam(1, $pwd, PDO::PARAM_STR);
+    $pwd = generateStrongPassword($opt["password_length"]);
+    $hashPwd = generateHashedPassword($pwd, $opt["password_hasher"]);
+	$stmt = $smarty->dbh()->prepare("UPDATE {$opt["table_prefix"]}users SET password = ? WHERE userid = ?");
+	$stmt->bindParam(1, $hashPwd, PDO::PARAM_STR);
 	$stmt->bindParam(2, $resetuserid, PDO::PARAM_INT);
     $stmt->execute();
     sendMail($opt["email_reply_to"],$resetemail,"Gift Registry password reset","Your Gift Registry password was reset to $pwd.",$opt);

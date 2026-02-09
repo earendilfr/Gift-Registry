@@ -15,12 +15,18 @@
 
 
 function getFullPath($url) {
-	$fp = $_SERVER["SERVER_PORT"] == "443" ? "https://" : "http://";
-	$fp .= $_SERVER["HTTP_HOST"];
-	$dir = dirname($_SERVER["PHP_SELF"]);
-	if ($dir != "/")
-		$fp .= $dir;
-	$fp .= "/" . $url;
+    $fp = "";
+    if (isset($_SERVER["HTTP_HOST"])) {
+            $fp .= sprintf("%s://%s",
+            $_SERVER["SERVER_PORT"] == "443" ? "https" : "http",
+            $_SERVER["HTTP_HOST"],
+        );
+    }
+    $dir = dirname($_SERVER["PHP_SELF"]);
+    $fp .= sprintf("%s%s",
+        $dir != "/" ? "$dir/" : "/",
+        $url,
+    );
 	return $fp;
 }
 
@@ -150,23 +156,86 @@ function sendMessage($sender, $recipient, $message, $dbh, $opt) {
 	}
 }
 
-function generatePassword($opt) {
-	//* borrowed from hitech-password.php - a PHP Message board script
-	//* (c) Hitech Scripts 2003
-	//* For more information, visit http://www.hitech-scripts.com
-	//* modified for phpgiftreg by Chris Clonch
-	mt_srand((double) microtime() * 1000000);
-	$newstring = "";
-	if ($opt["password_length"] > 0) {
-		while(strlen($newstring) < $opt["password_length"]) {
-			switch (mt_rand(1,3)) {
-				case 1: $newstring .= chr(mt_rand(48,57)); break;  // 0-9
-				case 2: $newstring .= chr(mt_rand(65,90)); break;  // A-Z
-				case 3: $newstring .= chr(mt_rand(97,122)); break; // a-z
-			}
-		}
-	}
-	return $newstring;
+function generateStrongPassword(
+    int $length = 16,
+    bool $includeDigits = true,
+    bool $includeUppercase = true,
+    bool $includeLowercase = true,
+    bool $includeSymbols = true,
+):string {
+    # Borrowed from this website:
+    # https://oxomichael.github.io/en/posts/2025-07-08-generate-secure-password-php/
+    # Generate password from 16 char at least
+    $length = max($length, 16);
+    $characterSets = [];
+    if ($includeDigits) {
+        $characterSets[] = implode(range(0, 9));
+    }
+    if ($includeUppercase) {
+        $characterSets[] = implode(range('A', 'Z'));
+    }
+    if ($includeLowercase) {
+        $characterSets[] = implode(range('a', 'z'));
+    }
+    if ($includeSymbols) {
+        $characterSets[] = implode(array_merge(
+            range(chr(33),chr(47)),
+            range(chr(58),chr(64)),
+            range(chr(91),chr(96)),
+            range(chr(123),chr(126)),
+        ));
+    }
+    if (empty($characterSets)) {
+        throw new \InvalidArgumentException('At least one character set must be selected.');
+    }
+    $allCharacters = implode('', $characterSets);
+
+# Generate the password
+    $password = "";
+    foreach($characterSets as $set) {
+        $password .= $set[random_int(0, strlen($set) - 1)];
+    }
+    $remainingLength = $length - count($characterSets);
+    for ($i = 0; $i < $remainingLength; $i++) {
+        $password .= $allCharacters[random_int(0, strlen($allCharacters) - 1)];
+    }
+
+    return $password;
+}
+
+function generateHashedPassword(
+    string $password,
+    string $func = "argon2id",
+): string {
+    # Generate password to be inserted in DB
+    switch(strtolower($func)) {
+        case "argon2id":
+            $hash_pwd = password_hash($password, PASSWORD_ARGON2ID);
+            break;
+        case "bcrypt":
+            $hash_pwd = password_hash($password, PASSWORD_BCRYPT);
+            break;
+        default:
+            throw new \InvalidArgumentException('Only argon2id and bcrypt are accepted for function to hash password.');
+    }
+    return $hash_pwd;
+}
+
+function verifyHashedPassword(
+    string $password,
+    string $hashPassword,
+    string $func = "argon2id",
+): bool {
+    # Verify password hash
+    switch(strtolower($func)) {
+        case "argon2id":
+        case "bcrypt":
+            return password_verify($password, $hashPassword);
+            break;
+        default:
+            throw new \InvalidArgumentException('Only argon2id, bcrypt and sha1 are accepted for function to verify password.');
+    }
+    return false;
 }
 
 function formatPrice($price, $opt) {

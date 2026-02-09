@@ -30,19 +30,20 @@ if (!empty($_POST["username"])) {
 	$password = $_POST["password"];
 
 	try {
-		$stmt = $smarty->dbh()->prepare("SELECT userid, fullname, admin FROM {$opt["table_prefix"]}users WHERE username = ? AND password = {$opt["password_hasher"]}(?) AND approved = 1");
+        $stmt = $smarty->dbh()->prepare("SELECT password, userid, fullname, admin FROM {$opt["table_prefix"]}users WHERE username = ? AND approved = 1");
 		$stmt->bindParam(1, $username, PDO::PARAM_STR);
-		$stmt->bindParam(2, $password, PDO::PARAM_STR);
 
 		$stmt->execute();
-		if ($row = $stmt->fetch()) {
-			session_start();
-			$_SESSION["userid"] = $row["userid"];
-			$_SESSION["fullname"] = $row["fullname"];
-			$_SESSION["admin"] = $row["admin"];
+        if ($row = $stmt->fetch()) {
+            if (verifyHashedPassword($password, $row["password"], $opt["password_hasher"])) {
+			    session_start();
+			    $_SESSION["userid"] = $row["userid"];
+			    $_SESSION["fullname"] = $row["fullname"];
+			    $_SESSION["admin"] = $row["admin"];
 		
-			header("Location: " . getFullPath("index.php"));
-			exit;
+			    header("Location: " . getFullPath("index.php"));
+			    exit;
+            }
 		}
 	}
 	catch (PDOException $e) {
